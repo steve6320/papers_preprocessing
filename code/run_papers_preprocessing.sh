@@ -2,6 +2,7 @@
 
 # Prerequisites
 # Run `aws configure` to set access credentials and AWS region.
+# Install Python jsonlines library by running `pip install jsonlines`.
 # Set environment variable AWS_ROOT to the AWS path where files will be stored under.
 #   Example: s3://mybucket/my/path/
 # Set environment variable RUN_ID to a unique string for this run.
@@ -80,3 +81,6 @@ sleep 2
 
 # Retrieve to local machine.
 aws s3 cp --recursive ${BASE_PATH}results/s2ag/joined/ $RESULTS_LOCAL_DIR/s2ag/joined/
+
+# Add rctScore ("Level 2" result)
+python3 code/add_rct_score.py $RESULTS_LOCAL_DIR/s2ag/joined/ $RESULTS_LOCAL_DIR/s2ag/with_rct_score/
