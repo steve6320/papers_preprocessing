@@ -1,11 +1,18 @@
 import gzip
+import json
 import jsonlines
 import os
+import requests
 import sys
 
 # Arguments of script:
 # Directory, ending in /, containing JSON lines files with rctScore missing
 # Directory, ending in /, to place output JSON lines files with rctScore added
+
+# Prerequisites:
+# Run the RCT score service on localhost:8080 by running in two separate terminal windows:
+#   dockerd
+#   docker run -p 8080:8080 public.ecr.aws/t9g4g7y2/rct-svm:latest
 
 source_dir = sys.argv[1]
 dest_dir = sys.argv[2]
@@ -22,5 +29,22 @@ for filename in os.listdir(source_dir):
             with jsonlines.open(out_filename, mode='w') as writer:
                 reader = jsonlines.Reader(source_file)
                 for row in reader:
-                    row['rctScore'] = 0
+                    payload='{{"title_abstract_pairs": {}}}'.format(json.dumps([[row['title'], row['abstract']]]))
+                    rct_score_result = requests.post(
+                        url='http://localhost:8080/',
+                        data=payload,
+                        headers={
+                            'accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-Api-Key': 'anything',
+                        },
+                    )
+                    rct_score_result_parsed = rct_score_result.json()
+                    if 'scores' not in rct_score_result_parsed:
+                        print("Error getting rctScore:", rct_score_result_parsed)
+                        row['rctScore'] = None
+                    else:
+                        row['rctScore'] = rct_score_result_parsed['scores'][0]
                     writer.write(row)
+
+print ('Finished adding rctScore for all rows')

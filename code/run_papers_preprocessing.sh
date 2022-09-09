@@ -7,6 +7,12 @@
 #   Example: s3://mybucket/my/path/
 # Set environment variable RUN_ID to a unique string for this run.
 # Set environment variable RESULTS_LOCAL_DIR to a local directory to place results into.
+# Run the RCT score service on localhost:8080 by running in two separate terminal windows:
+#   dockerd
+#   docker run -p 8080:8080 public.ecr.aws/t9g4g7y2/rct-svm:latest
+#
+# Then run this script from the repository root directory:
+# ./code/run_papers_preprocessing.sh
 
 BASE_PATH=${AWS_ROOT}${RUN_ID}/
 
