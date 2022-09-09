@@ -28,6 +28,8 @@ for filename in os.listdir(source_dir):
         with gzip.open(full_filename, "rb") as source_file:
             with jsonlines.open(out_filename, mode='w') as writer:
                 reader = jsonlines.Reader(source_file)
+                # TODO Batch ~20 rows together when calling the RCT score service
+                # instead of one row at a time.
                 for row in reader:
                     payload='{{"title_abstract_pairs": {}}}'.format(json.dumps([[row['title'], row['abstract']]]))
                     rct_score_result = requests.post(
